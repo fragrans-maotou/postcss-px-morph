@@ -1,5 +1,7 @@
 # postcss-px-morph
 
+English | [简体中文](./README.zh-CN.md)
+
 [![NPM Version](https://img.shields.io/npm/v/postcss-px-morph.svg)](https://www.npmjs.com/package/postcss-px-morph)
 [![License](https://img.shields.io/npm/l/postcss-px-morph.svg)](https://github.com/fragrans-maotou/postcss-px-morph/blob/main/LICENSE)
 
@@ -34,16 +36,12 @@ This is the most powerful mode. It uses `rem` for typography to respect user's b
 module.exports = {
   plugins: {
     'px-morph': {
-      mode: 'hybrid',
+      mode: 'rem',
       rootValue: 16,
       viewportWidth: 375,
-      remPropList: [
-        'font', 
-        'font-size', 
-        'line-height', 
-        'letter-spacing'
-        // Add other properties you want to convert to rem
-      ]
+      unitPrecision: 5,
+      minPixelValue: 1,
+      enabled: true
     }
   }
 }
@@ -68,8 +66,8 @@ module.exports = {
 | Option          | Type                      | Default                                             | Description                                                                                                                                                             |
 | --------------- | ------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `defaultMode`   | `'rem'`, `'vw'` | `'rem'`                                             | The default conversion mode.                                                                                                                                                    |
-| `remProperties` | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard) are converted to `rem`.                                                                                                                                |
-| `vwProperties`  | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard) are converted to `vw`.                                                                                                                               |
+| `remProperties` | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard, for example `font-*` will match `font-size`, `font-weight` etc.) are converted to `rem`.                                                                                                                                |
+| `vwProperties`  | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard, for example `width-*` will match `width`, `height` etc.) are converted to `vw`.                                                                                                                               |
 
 
 
