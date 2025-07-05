@@ -1,0 +1,52 @@
+{
+  "name": "postcss-px-morph",
+  "version": "0.1.0",
+  "description": "A flexible PostCSS plugin to transform px to rem, vw, or a hybrid of both, with advanced configuration.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "px",
+    "rem",
+    "pxtorem",
+    "vw",
+    "pxtovw",
+    "responsive",
+    "mobile",
+    "h5"
+  ],
+  "author": "1621151730@qq.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1621151730/postcss-px-morph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/1621151730/postcss-px-morph/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/1621151730/postcss-px-morph",
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "minimatch": "^10.0.3",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "postcss": "^8.0.0"
+  }
+}

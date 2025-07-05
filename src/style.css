@@ -1,0 +1,18 @@
+/* src/style.css */
+
+.container {
+  width: 375px; /* 应该变为 100vw */
+  padding: 16px; /* 应该变为 4.26667vw */
+  border: 1px solid black; /* 1px 小于 minPixelValue (默认)，应该被忽略 */
+}
+
+.title {
+  font-size: 24px; /* 应该变为 1.5rem */
+  line-height: 32px; /* 应该变为 2rem */
+  margin-bottom: 10px; /* 应该变为 2.66667vw */
+}
+
+.description {
+  font-size: 14px; /* 应该变为 0.875rem */
+  color: #333;
+}
