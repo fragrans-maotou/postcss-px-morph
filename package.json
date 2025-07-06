@@ -25,19 +25,19 @@
     "mobile",
     "h5"
   ],
-  "author": "1621151730@qq.com",
+  "author": "fragrans-maotou",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/1621151730/postcss-px-morph.git"
+    "url": "https://github.com/fragrans-maotou/postcss-px-morph.git"
   },
   "bugs": {
-    "url": "https://github.com/1621151730/postcss-px-morph/issues"
+    "url": "https://github.com/fragrans-maotou/postcss-px-morph/issues"
   },
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/1621151730/postcss-px-morph",
+  "homepage": "https://github.com/fragrans-maotou/postcss-px-morph",
   "devDependencies": {
     "@types/node": "^24.0.10",
     "minimatch": "^10.0.3",

@@ -33,18 +33,34 @@ npm install --save-dev postcss postcss-px-morph
 
 ```javascript
 // postcss.config.js
-module.exports = {
-  plugins: {
-    'px-morph': {
-      mode: 'rem',
-      rootValue: 16,
-      viewportWidth: 375,
-      unitPrecision: 5,
-      minPixelValue: 1,
-      enabled: true
+const { defineConfig } = require('@vue/cli-service')
+// 引入我们的插件
+const pxMorphPlugin = require('postcss-px-morph');
+
+module.exports = defineConfig({
+  transpileDependencies: true,
+
+  css: {
+    loaderOptions: {
+      postcss: {
+        postcssOptions: {
+          plugins: [
+            pxMorphPlugin({
+              mode: 'rem',
+              rootValue: 16,
+              viewportWidth: 375,
+              unitPrecision: 5,
+              minPixelValue: 1,
+              include: ['**/*.vue'],
+              enabled: true
+            })
+          ]
+        }
+      }
     }
   }
-}
+})
+
 ```
 
 ## 配置选项
