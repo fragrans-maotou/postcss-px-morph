@@ -14,10 +14,13 @@ exports.defaultOptions = {
         remProperties: [],
         vwProperties: [],
     },
-    include: ['**/*.{css,scss,less,styl,stylus,sass,scss,less,styl,stylus,sass}'],
+    include: ['**/*.css', '**/*.scss', '**/*.less', '**/*.styl', '**/*.stylus', '**/*.sass', '**/*.vue'],
     exclude: [
-        '**/*.{min.css,min.scss,min.less,min.styl,min.stylus,min.sass,min.scss,min.less,min.styl,min.stylus,min.sass}',
-        'node_modules/**/*'
+        '**/*.min.css', '**/*.min.scss', '**/*.min.less', '**/*.min.styl', '**/*.min.stylus', '**/*.min.sass',
+        '**/*.min.vue', '**/*.min.js', '**/*.min.ts', '**/*.min.tsx', '**/*.min.jsx', '**/*.min.json', '**/*.min.html',
+        '**/*.min.md', '**/*.min.txt', '**/*.min.xml', '**/*.min.yaml', '**/*.min.yml', '**/*.min.toml', '**/*.min.ini',
+        '**/*.min.conf', '**/*.min.config', '**/*.min.properties', '**/*.min.env', '**/*.min.env.local', '**/*.min.env.development',
+        '**/*.min.env.production', '**/*.min.env.test', 'node_modules/**/*'
     ],
     enabled: true,
 };
@@ -114,5 +117,5 @@ const Plugin = (options = { mode: 'rem' }) => {
 };
 exports.default = Plugin;
 // 兼容让插件在 require('postcss-postcss-px-morph') 中使用
-// module.exports = Plugin;
-// module.exports.default = Plugin;
+module.exports = Plugin;
+module.exports.default = Plugin;
