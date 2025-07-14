@@ -1,7 +1,8 @@
 // src/index.test.ts
 import { describe, it, expect } from 'vitest';
 import postcss from 'postcss';
-import pxMorphPlugin from '../index.js'; // 我们的插件
+import pxMorphPlugin from '../../dist/index.js';
+// import pxMorphPlugin from '../index.js';
 
 async function run(input: string, opts: any) {
   const { css } = await postcss([pxMorphPlugin(opts)]).process(input, { from: 'test.css' });
@@ -45,4 +46,11 @@ describe('PostCSS PxMorph Plugin', () => {
     const result = await run(input, { mode: 'rem', rootValue: 16, minPixelValue: 2 });
     expect(result).toBe(expected);
   });
+
+  it('应该忽略 px-ignore 的值', async ()=>{
+    const input  = '.test { font-size: 24px; margin: 32px; /*px-ignore*/ }'
+    const expected = '.test { font-size: 1.5rem; margin: 32px; /*px-ignore*/ }'
+    const result = await run(input, { mode: 'rem', rootValue: 16 })
+    expect(result).toBe(expected)
+  })
 });

@@ -55,6 +55,14 @@ const isPropMatch = (prop, properties) => {
         }
     });
 };
+const isPxIgnore = (decl) => {
+    var _a;
+    const comment = decl.next();
+    if ((comment === null || comment === void 0 ? void 0 : comment.type) === 'comment') {
+        return (_a = comment.text) === null || _a === void 0 ? void 0 : _a.includes('px-ignore');
+    }
+    return false;
+};
 // ----------------------Post CSS Plugin ----------------------
 const Plugin = (options = { mode: 'rem' }) => {
     const opts = { ...exports.defaultOptions, ...options };
@@ -75,6 +83,9 @@ const Plugin = (options = { mode: 'rem' }) => {
             root.walkDecls(decl => {
                 // 判断是否包含px
                 if (!decl.value.includes('px'))
+                    return;
+                // px-ignore 不转换,value中获取不到注释内容
+                if (isPxIgnore(decl))
                     return;
                 const newValue = decl.value.replace(pxRegex, (match, str1, str2, px) => {
                     // 如果匹配到的是引号中的内容、url() 或 px 值为空，则忽略
@@ -116,6 +127,6 @@ const Plugin = (options = { mode: 'rem' }) => {
     };
 };
 exports.default = Plugin;
-// 兼容让插件在 require('postcss-postcss-px-morph') 中使用
+// 兼容让插件在 require('postcss-px-morph') 中使用
 module.exports = Plugin;
 module.exports.default = Plugin;

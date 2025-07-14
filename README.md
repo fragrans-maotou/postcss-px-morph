@@ -46,11 +46,16 @@ module.exports = defineConfig({
         postcssOptions: {
           plugins: [
             pxMorphPlugin({
-              mode: 'rem',
+              mode: 'hybrid',
               rootValue: 16,
               viewportWidth: 375,
               unitPrecision: 5,
               minPixelValue: 1,
+              hybridOptions: {
+                defaultMode: 'rem',
+                remProperties: ['font*', 'line-height'], 
+                vwProperties: ['width', 'height', 'margin-*'],
+              }
               include: ['**/*.vue'],
               enabled: true
             })

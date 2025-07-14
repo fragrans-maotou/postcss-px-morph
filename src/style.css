@@ -13,6 +13,6 @@
 }
 
 .description {
-  font-size: 14px; /* 应该变为 0.875rem */
-  color: #333;
+  font-size: 14px; /* px-ignore*/
+  color: #333;  /* 不做改变 */
 }

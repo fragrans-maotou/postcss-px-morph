@@ -27,6 +27,44 @@ npm install --save-dev postcss postcss-px-morph
 
 将 `postcss-px-morph` 添加到 `postcss.config.js` 的插件配置中。
 
+### 示例：rem / vw 模式
+
+它使用 `rem`/ `vw` 处理排版以尊重用户的浏览器字体设置
+```javascript
+// postcss.config.js
+const { defineConfig } = require('@vue/cli-service')
+// 引入我们的插件
+const pxMorphPlugin = require('postcss-px-morph');
+
+module.exports = defineConfig({
+  transpileDependencies: true,
+
+  css: {
+    loaderOptions: {
+      postcss: {
+        postcssOptions: {
+          plugins: [
+            pxMorphPlugin({
+              mode: 'rem',
+              // mode:'vw',
+              rootValue: 16,
+              viewportWidth: 375,
+              unitPrecision: 5,
+              minPixelValue: 1,
+              include: ['**/*.vue'],
+              enabled: true
+            })
+          ]
+        }
+      }
+    }
+  }
+})
+
+```
+
+
+
 ### 示例：混合模式（推荐）
 
 这是最强大的模式。它使用 `rem` 处理排版以尊重用户的浏览器字体设置，同时使用 `vw` 处理布局以确保完美缩放。
@@ -46,11 +84,16 @@ module.exports = defineConfig({
         postcssOptions: {
           plugins: [
             pxMorphPlugin({
-              mode: 'rem',
+              mode: 'hybrid',
               rootValue: 16,
               viewportWidth: 375,
               unitPrecision: 5,
               minPixelValue: 1,
+              hybridOptions: {
+                defaultMode: 'rem',
+                remProperties: ['font*', 'line-height'], 
+                vwProperties: ['width', 'height', 'margin-*'],
+              }
               include: ['**/*.vue'],
               enabled: true
             })
@@ -81,7 +124,7 @@ module.exports = defineConfig({
 
 | 选项               | 类型             | 默认值    | 描述                                                                         |
 | ------------------ | ---------------- | --------- | ---------------------------------------------------------------------------- |
-| `defaultMode`      | `'rem'`, `'vw'`  | `'rem'`   | 默认转换模式                                                                 |
+| `defaultMode`      | `'rem'`, `'vw'`  | `'rem'`   | 默认转换模式，没有包含在`remProperties`、  `vwProperties`的属性，会默认转化成此mode                                                           |
 | `remProperties`    | `string[]`       | `[]`      | 此列表中的属性（支持 `*` 通配符,例如 `font-*` 会匹配 `font-size`, `font-weight` 等）将被转换为 `rem`                              |
 | `vwProperties`     | `string[]`       | `[]`      | 此列表中的属性（支持 `*` 通配符,例如 `font-*` 会匹配 `font-size`, `font-weight` 等）将被转换为 `vw`                               |
 
