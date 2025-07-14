@@ -93,7 +93,7 @@ module.exports = defineConfig({
                 defaultMode: 'rem',
                 remProperties: ['font*', 'line-height'], 
                 vwProperties: ['width', 'height', 'margin-*'],
-              }
+              },
               include: ['**/*.vue'],
               enabled: true
             })
