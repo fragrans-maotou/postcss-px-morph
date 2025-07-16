@@ -1,99 +1,121 @@
-# postcss-px-morph
+[English](./README.en-US.md) | 简体中文
 
-English | [简体中文](./README.zh-CN.md)
+<div align="center">
 
-[![NPM Version](https://img.shields.io/npm/v/postcss-px-morph.svg)](https://www.npmjs.com/package/postcss-px-morph)
-[![License](https://img.shields.io/npm/l/postcss-px-morph.svg)](https://github.com/fragrans-maotou/postcss-px-morph/blob/main/LICENSE)
+  <h1>postcss-px-morph</h1>
+  <p>优雅地将 <code>px</code> 一键转换为 <code>rem</code>、<code>vw</code> 或智能 <code>hybrid</code> 模式。</p>
 
-A flexible PostCSS plugin to transform `px` to `rem`, `vw`, or a smart `hybrid` of both.
+  [![npm version](https://img.shields.io/npm/v/postcss-px-morph.svg?style=flat-square)](https://npmjs.com/package/postcss-px-morph)
+  [![license](https://img.shields.io/npm/l/postcss-px-morph.svg?style=flat-square)](./LICENSE)
+  ![typescript](https://img.shields.io/badge/TypeScript-Ready-3178c6?style=flat-square)
 
-`postcss-px-morph` helps you effortlessly create adaptive layouts by converting fixed pixel units into responsive units, with powerful and intuitive configuration.
+</div>
 
-## Why postcss-px-morph?
 
-* **All-in-One**: Supports `rem`, `vw`, and a unique **`hybrid`** mode.
-* **Smart Hybrid Mode**: Convert layout properties to `vw` and font-related properties to `rem` automatically within the same project. Get the best of both worlds!
-* **Highly Configurable**: Fine-tune every aspect of the conversion, from base values to property lists.
-* **Zero-Config Friendly**: Works out of the box with sensible defaults.
-* **TypeScript Ready**: Written in TypeScript with full type definitions.
+## ✨ 特性一览
 
-## Installation
+| 特性 | 说明 |
+| --- | --- |
+| 🧩 一体化 | 支持 `rem`、`vw` 及独创的 `hybrid` 混合模式 |
+| 🧠 智能混合 | 布局用 `vw`，排版用 `rem`，兼顾缩放与用户字体偏好 |
+| ⚙️ 高度可配置 | 基准值、精度、属性黑白名单随心定义 |
+| 🚀 零配置可用 | 无需任何配置即可开箱即用 |
+| 🔷 TypeScript | 源码与类型提示全量 TS 化 |
+
+---
+
+## 📦 安装
 
 ```bash
-npm install --save-dev postcss postcss-px-morph
+npm i -D postcss postcss-px-morph
 ```
 
-## Usage
+---
 
-Add `postcss-px-morph` to your `postcss.config.js` plugins.
+## 🛠️ 快速开始
 
-### Example: Hybrid Mode (Recommended)
+### ① rem / vw 模式
 
-This is the most powerful mode. It uses `rem` for typography to respect user's browser font settings and `vw` for layout to ensure perfect scaling.
-
-```javascript
+```js
 // postcss.config.js
-const { defineConfig } = require('@vue/cli-service')
-// 引入我们的插件
-const pxMorphPlugin = require('postcss-px-morph');
-
-module.exports = defineConfig({
-  transpileDependencies: true,
-
-  css: {
-    loaderOptions: {
-      postcss: {
-        postcssOptions: {
-          plugins: [
-            pxMorphPlugin({
-              mode: 'hybrid',
-              rootValue: 16,
-              viewportWidth: 375,
-              unitPrecision: 5,
-              minPixelValue: 1,
-              hybridOptions: {
-                defaultMode: 'rem',
-                remProperties: ['font*', 'line-height'], 
-                vwProperties: ['width', 'height', 'margin-*'],
-              },
-              include: ['**/*.vue'],
-              enabled: true
-            })
-          ]
-        }
-      }
-    }
-  }
-})
-
+module.exports = {
+  plugins: [
+    require('postcss-px-morph')({
+      mode: 'rem',      // 或 'vw'
+      rootValue: 16,
+      viewportWidth: 375,
+      unitPrecision: 5,
+      minPixelValue: 1,
+      include: ['**/*.vue']
+    })
+  ]
+}
 ```
 
-## Configuration Options
+### ② hybrid（混合）模式 —— **强烈推荐**
 
-| Option          | Type                      | Default                                             | Description                                                                                                                                                             |
-| --------------- | ------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mode`          | `'rem'`, `'vw'`, `'hybrid'` | `'rem'`                                             | The conversion mode.                                                                                                                                                    |
-| `rootValue`     | `number`                  | `16`                                                | Base font size for `rem` conversion.                                                                                                                                    |
-| `viewportWidth` | `number`                  | `375`                                               | Viewport width for `vw` conversion. Typically your design draft width.                                                                                                  |
-| `unitPrecision` | `number`                  | `5`                                                 | The number of decimal places for the converted values.                                                                                                                  |
-| `minPixelValue` | `number`                  | `1`                                                 | Pixels values below this will not be converted.                                                                                                                         |
-| `hybridOptions`   | `object`                | `{ defaultMode: 'rem', remProperties: [], vwProperties: [] }`                        | In `hybrid` mode, properties in this list (supports `*` wildcard) are converted to `rem`. Others are converted to `vw`.                                                    |
-| `include`       | `string[]`                  | `[]`                                              | A regex to include files for processing.                                                                                                                                |
-| `exclude`       | `string[]`                  | `[]`                                              | A regex to exclude files from processing.                                                                                                                               |
-| `enabled`       | `boolean`                  | `true`                                              | Whether to enable the plugin.                                                                                                                                |
+```js
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('postcss-px-morph')({
+      mode: 'hybrid',
+      rootValue: 16,
+      viewportWidth: 375,
+      unitPrecision: 5,
+      minPixelValue: 1,
+      hybridOptions: {
+        defaultMode: 'rem',
+        remProperties: ['font*', 'line-height'],
+        vwProperties: ['width', 'height', 'margin-*', 'padding-*']
+      },
+      include: ['**/*.vue']
+    })
+  ]
+}
+```
 
-### hybridOptions
+---
 
-| Option          | Type                      | Default                                             | Description                                                                                                                                                             |
-| --------------- | ------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defaultMode`   | `'rem'`, `'vw'` | `'rem'`                                             | The default conversion mode.                                                                                                                                                    |
-| `remProperties` | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard, for example `font-*` will match `font-size`, `font-weight` etc.) are converted to `rem`.                                                                                                                                |
-| `vwProperties`  | `string[]`                  | `[]`                                              | Properties in this list (supports `*` wildcard, for example `width-*` will match `width`, `height` etc.) are converted to `vw`.                                                                                                                               |
+### ⚙️ 配置项
 
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `mode` | `'rem' \| 'vw' \| 'hybrid'` | `'rem'` | 转换模式 |
+| `rootValue` | `number` | `16` | 根字体大小（`rem` 计算基准） |
+| `viewportWidth` | `number` | `375` | 设计稿视口宽度（`vw` 计算基准） |
+| `unitPrecision` | `number` | `5` | 保留小数位 |
+| `minPixelValue` | `number` | `1` | 小于该值的 `px` 将忽略 |
+| `minusPxToMinusMode` | `boolean` | `true` | 是否转换负值（如 `-16px` → `-1rem`） |
+| `hybridOptions` | `object` | 见下文 | `hybrid` 模式下专用 |
+| `include / exclude` | `string[]` | `[]` | 文件包含/排除规则 |
+| `enabled` | `boolean` | `true` | 是否启用插件 |
 
+#### hybridOptions
 
+| 子项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `defaultMode` | `'rem' \| 'vw'` | `'rem'` | 未命中列表时的兜底模式 |
+| `remProperties` | `string[]` | `[]` | 命中列表的属性转 `rem`（支持 `*` 通配符） |
+| `vwProperties` | `string[]` | `[]` | 命中列表的属性转 `vw`（支持 `*` 通配符） |
 
+---
 
-## License
+### 📝 使用技巧（增强功能）
+
+#### 行内忽略
+
+在代码行尾添加 `/* px-ignore */`，即可跳过该行转换：
+
+```css
+.card {
+  border: 1px solid #000; /* px-ignore */
+  margin: 16px;           /* → 会被转换 */
+}
+```
+
+---
+
+### 📄 License
 
 [MIT](./LICENSE)

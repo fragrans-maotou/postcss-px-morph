@@ -14,5 +14,14 @@
 
 .description {
   font-size: 14px; /* px-ignore*/
+  margin-top: -16px;
+  height: calc(100% - 24px);
+  margin: 0 -16px 16px 0;
   color: #333;  /* 不做改变 */
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100px;
+  }
 }

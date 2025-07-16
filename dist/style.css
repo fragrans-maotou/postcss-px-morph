@@ -7,12 +7,21 @@
 }
 
 .title {
-  font-size: 1.5rem; /* 应该变为 1.5rem */
+  font-size: 6.4vw; /* 应该变为 1.5rem */
   line-height: 2rem; /* 应该变为 2rem */
   margin-bottom: 2.66667vw; /* 应该变为 2.66667vw */
 }
 
 .description {
   font-size: 14px; /* px-ignore*/
+  margin-top: -4.26667vw;
+  height: calc(100% - 6.4vw);
+  margin: 0 -4.26667vw 4.26667vw 0;
   color: #333;  /* 不做改变 */
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 26.66667vw;
+  }
 }
