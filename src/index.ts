@@ -16,6 +16,8 @@ export interface PxMorphOptions {
   unitPrecision?: number
   /**触发转换的最小像素值 */
   minPixelValue?: number
+  /** 是否开启负值的转化 */
+  minusPxToMinusMode?: boolean
   /**
    * 'hybrid' 模式下，指定哪些属性转换为rem，哪些转换为vw
    * 支持通配符 '*', 例如 'font-*' 会匹配 'font-size', 'font-weight' 等
@@ -48,6 +50,7 @@ export const defaultOptions: Required<PxMorphOptions> = {
     remProperties: [],
     vwProperties: [],
   },
+  minusPxToMinusMode: true,
   include: ['**/*.css', '**/*.scss', '**/*.less', '**/*.styl', '**/*.stylus', '**/*.sass', '**/*.vue'],
   exclude: [
     '**/*.min.css', '**/*.min.scss', '**/*.min.less', '**/*.min.styl', '**/*.min.stylus', '**/*.min.sass',
@@ -61,32 +64,84 @@ export const defaultOptions: Required<PxMorphOptions> = {
 
 // ----------------------Helper Functions ----------------------
 
-const pxRegex = /"([^"]+)"|'([^']+)'|url\([^)]+\)|(\d*\.?\d+)px/g
+const pxRegex = /"([^"\n]*)"|'([^'\n]*)'|url\([^)\n]*\)|(\d*\.?\d+)px/g
 
-const isPropMatch = (prop: string, properties: string[]) => {
-  return properties.some(propertie => {
-    // 处理不同的通配符模式
-    if (propertie === '*') {
-      // 完全通配，匹配所有属性
+const sanitizeProperty = (prop: string): string => {
+  // 限制属性名长度，防止ReDoS
+  const MAX_LENGTH = 100;
+  if (prop.length > MAX_LENGTH) {
+    return prop.substring(0, MAX_LENGTH);
+  }
+  // 只允许字母、数字、连字符和下划线
+  return prop.replace(/[^a-zA-Z0-9-_]/g, '');
+};
+
+const isPropMatch = (prop: string, properties: string[]): boolean => {
+  if (!prop || typeof prop !== 'string') return false;
+  
+  const sanitizedProp = sanitizeProperty(prop.toLowerCase());
+  if (!sanitizedProp) return false;
+  
+  return properties.some(pattern => {
+    if (!pattern || typeof pattern !== 'string') return false;
+    
+    const sanitizedPattern = sanitizeProperty(pattern.toLowerCase());
+    if (!sanitizedPattern) return false;
+    
+    if (sanitizedPattern === '*') {
       return true;
-    } else if (propertie.startsWith('*')) {
-      // 后缀匹配：*-size 匹配 font-size, grid-size 等
-      const suffix = propertie.slice(1);
-      return prop.endsWith(suffix);
-    } else if (propertie.endsWith('*')) {
-      // 前缀匹配：font* 匹配 font, font-size, font-weight 等
-      const prefix = propertie.slice(0, -1);
-      return prop.startsWith(prefix);
-    } else if (propertie.includes('*')) {
-      // 中间匹配：margin-*-size 匹配 margin-top-size, margin-bottom-size 等
-      const [prefix, ...rest] = propertie.split('*');
-      const suffix = rest.join('*');
-      return prop.startsWith(prefix) && prop.endsWith(suffix);
-    } else {
-      // 精确匹配：完全相等
-      return prop === propertie;
     }
+    
+    // 限制通配符使用，防止复杂模式
+    const wildcardCount = (sanitizedPattern.match(/\*/g) || []).length;
+    if (wildcardCount > 2) return false; // 最多允许2个通配符
+    
+    if (sanitizedPattern.startsWith('*') && sanitizedPattern.endsWith('*')) {
+      // *middle* 模式
+      const middle = sanitizedPattern.slice(1, -1);
+      return sanitizedProp.includes(middle);
+    } else if (sanitizedPattern.startsWith('*')) {
+      // *suffix 模式
+      const suffix = sanitizedPattern.slice(1);
+      return sanitizedProp.endsWith(suffix);
+    } else if (sanitizedPattern.endsWith('*')) {
+      // prefix* 模式
+      const prefix = sanitizedPattern.slice(0, -1);
+      return sanitizedProp.startsWith(prefix);
+    } else if (sanitizedPattern.includes('*')) {
+      // prefix*suffix 模式
+      const parts = sanitizedPattern.split('*');
+      if (parts.length === 2) {
+        const [prefix, suffix] = parts;
+        return sanitizedProp.startsWith(prefix) && sanitizedProp.endsWith(suffix);
+      }
+    }
+    
+    // 精确匹配
+    return sanitizedProp === sanitizedPattern;
   });
+};
+
+
+const isPxIgnore = (decl: any) =>{
+  const comment = decl.next()
+  if(comment?.type === 'comment'){
+    return comment.text?.includes('px-ignore')
+  }
+  return false
+}
+
+const isMinusPx = (decl: any) => {
+  // 1. 如果整个值就是一个负长度，例如 "-16px"
+  // 2. 如果里面出现了独立的负长度，例如 "-16px 0 0 -8px"
+  // 3. 但放过 calc(...) 里的减号
+  const hasNegativeToken = /(^|[^\w.)])-\d+(?:\.\d+)?px($|[^\w(])/i.test(decl.value);
+
+  if (hasNegativeToken) {
+    // 不开启负值转化，是负值，不转化
+    return true;
+  }
+  return false;
 }
 
 
@@ -94,7 +149,58 @@ const isPropMatch = (prop: string, properties: string[]) => {
 
 const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
 
-  const opts = { ...defaultOptions, ...options }
+// 输入验证和清理 - 使用默认值替代错误抛出
+const validateOptions = (options: PxMorphOptions): Required<PxMorphOptions> => {
+  const opts = { ...defaultOptions, ...options };
+  
+  // 验证数值参数 - 使用默认值或修正值
+  if (!Number.isFinite(opts.rootValue) || opts.rootValue <= 0) {
+    opts.rootValue = 16; // 使用默认值
+  }
+  if (!Number.isFinite(opts.viewportWidth) || opts.viewportWidth <= 0) {
+    opts.viewportWidth = 375; // 使用默认值
+  }
+  if (!Number.isFinite(opts.unitPrecision) || opts.unitPrecision < 0 || opts.unitPrecision > 20) {
+    opts.unitPrecision = Math.max(0, Math.min(20, Math.round(opts.unitPrecision || 5)));
+  }
+  if (!Number.isFinite(opts.minPixelValue) || opts.minPixelValue < 0) {
+    opts.minPixelValue = 1; // 使用默认值
+  }
+  
+  // 验证mode - 使用默认值
+  if (!['rem', 'vw', 'hybrid'].includes(opts.mode)) {
+    opts.mode = 'rem';
+  }
+  
+  // 验证hybridOptions - 清理无效值
+  if (opts.hybridOptions) {
+    if (opts.hybridOptions.defaultMode && !['rem', 'vw'].includes(opts.hybridOptions.defaultMode)) {
+      opts.hybridOptions.defaultMode = 'rem';
+    }
+    
+    // 清理属性数组
+    const sanitizePropertyArray = (arr: string[]): string[] => {
+      if (!Array.isArray(arr)) return [];
+      return arr.filter(item => typeof item === 'string' && item.length > 0).slice(0, 100); // 限制数组大小
+    };
+    
+    opts.hybridOptions.remProperties = sanitizePropertyArray(opts.hybridOptions.remProperties || []);
+    opts.hybridOptions.vwProperties = sanitizePropertyArray(opts.hybridOptions.vwProperties || []);
+  }
+  
+  // 清理include/exclude数组
+  const sanitizePatternArray = (arr: string[]): string[] => {
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(item => typeof item === 'string' && item.length > 0).slice(0, 100); // 限制数组大小
+  };
+  
+  opts.include = sanitizePatternArray(opts.include);
+  opts.exclude = sanitizePatternArray(opts.exclude);
+  
+  return opts;
+};
+
+const opts = validateOptions(options);
 
   return {
     postcssPlugin: 'px-morph',
@@ -114,11 +220,21 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
         // 判断是否包含px
         if (!decl.value.includes('px')) return
 
+        // px-ignore 不转换,value中获取不到注释内容
+        if (isPxIgnore(decl)) return
+        // 判断是否开启了负值的转化 开启了负值 平且 是负值  负值去转化
+        if (!opts.minusPxToMinusMode){
+          if (isMinusPx(decl)) return
+        }
+
+        // 替换掉px，转换为rem或vw
         const newValue = decl.value.replace(pxRegex, (match, str1, str2, px) => {
           // 如果匹配到的是引号中的内容、url() 或 px 值为空，则忽略
           if (str1 || str2 || !px) return match;
-
+          
+          // 严格验证px值，防止注入
           const pxValue = parseFloat(px);
+          if (!Number.isFinite(pxValue) || pxValue < 0) return match;
 
           if (pxValue < opts.minPixelValue) return match;
 
@@ -144,10 +260,15 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
             unit = opts.mode as PxMorphHybridMode;
           }
 
-          if (unit === 'rem') {
-            return pxToRem(pxValue, opts.rootValue, opts.unitPrecision);
-          } else { // vw
-            return pxToVw(pxValue, opts.viewportWidth, opts.unitPrecision);
+          try {
+            if (unit === 'rem') {
+              return pxToRem(pxValue, opts.rootValue, opts.unitPrecision);
+            } else { // vw
+              return pxToVw(pxValue, opts.viewportWidth, opts.unitPrecision);
+            }
+          } catch (error) {
+            // 转换失败时返回原值
+            return match;
           }
         });
 
@@ -163,6 +284,7 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
 
 export default Plugin;
 
-// 兼容让插件在 require('postcss-postcss-px-morph') 中使用
+// 兼容让插件在 require('postcss-px-morph') 中使用
 module.exports = Plugin;
 module.exports.default = Plugin;
+

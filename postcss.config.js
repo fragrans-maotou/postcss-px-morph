@@ -12,7 +12,8 @@ module.exports = {
         remProperties: ['font*', 'line-height'], // 字体相关和行高用rem，其他用vw
         vwProperties: ['width', 'height', 'margin-*'],
       },
-
+      mediaQuery: false,
+      minusPxToMinusMode: true
     }),
   ],
 };

@@ -12,6 +12,8 @@ export interface PxMorphOptions {
     unitPrecision?: number;
     /**触发转换的最小像素值 */
     minPixelValue?: number;
+    /** 是否开启负值的转化 */
+    minusPxToMinusMode?: boolean;
     /**
      * 'hybrid' 模式下，指定哪些属性转换为rem，哪些转换为vw
      * 支持通配符 '*', 例如 'font-*' 会匹配 'font-size', 'font-weight' 等

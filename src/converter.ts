@@ -9,10 +9,22 @@
  * @returns 转换后的 rem 字符串，例如 "1.5rem"
  */
 export function pxToRem(pxValue: number, rootValue: number, unitPrecision: number): string {
-  // 我们一起来实现这里的逻辑
-  if (pxValue === 0) return '0'
-  const remValue = parseFloat((pxValue / rootValue).toFixed(unitPrecision))
-  return `${remValue}rem`
+  if (!Number.isFinite(pxValue) || !Number.isFinite(rootValue) || !Number.isFinite(unitPrecision)) {
+    return '0';
+  }
+  if (rootValue <= 0) {
+    rootValue = 16; // 使用安全默认值
+  }
+  if (unitPrecision < 0 || unitPrecision > 20) {
+    unitPrecision = 5; // 使用安全默认值
+    throw new Error('Invalid unitPrecision: must be between 0 and 20');
+  }
+  if (pxValue === 0) return '0';
+  const remValue = parseFloat((pxValue / rootValue).toFixed(unitPrecision));
+  if (!Number.isFinite(remValue)) {
+    throw new Error('Invalid conversion result: overflow or underflow detected');
+  }
+  return `${remValue}rem`;
 }
 
 /**
@@ -23,8 +35,19 @@ export function pxToRem(pxValue: number, rootValue: number, unitPrecision: numbe
  * @returns 转换后的 vw 字符串，例如 "10.66667vw"
  */
 export function pxToVw(pxValue: number, viewportWidth: number, unitPrecision: number): string {
-  // 我们一起来实现这里的逻辑
-  if (pxValue === 0) return '0'
-  const vwValue = parseFloat(((pxValue / viewportWidth) * 100).toFixed(unitPrecision))
-  return `${vwValue}vw`
+  if (!Number.isFinite(pxValue) || !Number.isFinite(viewportWidth) || !Number.isFinite(unitPrecision)) {
+    return '0';
+  }
+  if (viewportWidth <= 0) {
+    return '0';
+  }
+  if (unitPrecision < 0 || unitPrecision > 20) {
+    throw new Error('Invalid unitPrecision: must be between 0 and 20');
+  }
+  if (pxValue === 0) return '0';
+  const vwValue = parseFloat(((pxValue / viewportWidth) * 100).toFixed(unitPrecision));
+  if (!Number.isFinite(vwValue)) {
+    throw new Error('Invalid conversion result: overflow or underflow detected');
+  }
+  return `${vwValue}vw`;
 }
