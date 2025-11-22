@@ -36,7 +36,55 @@ pnpm add -D postcss postcss-px-morph
 
 ## 🛠️ 使用方法
 
-将其添加到你的 `postcss.config.js`:
+### 加入到vue.config.js中
+
+简单使用
+```javascript
+module.exports = {
+  css: {
+    loaderOptions: {
+      postcss: {
+        plugins: [
+          require('postcss-px-morph')({
+            mode: 'rem',
+            rootValue: 16,
+            viewportWidth: 375,
+            unitPrecision: 5,
+            minPixelValue: 1,
+            include: ['**/*.vue'],
+          })
+        ]
+      }
+    }
+  }
+}
+```
+
+混入
+```javascript
+module.exports = {
+  css: {
+    loaderOptions: {
+      postcss: {
+        plugins: [
+          require('postcss-px-morph')({
+            mode: 'hybrid', // 'rem' | 'vw' | 'hybrid'
+            rootValue: 16,
+            viewportWidth: 375,
+            hybridOptions: {
+              defaultMode: 'rem',
+              vwProperties: ['width', 'height', 'margin*', 'padding*'],
+              remProperties: ['font*']
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+```
+
+### 将其添加到你的 `postcss.config.js`:
 
 ```javascript
 module.exports = {
