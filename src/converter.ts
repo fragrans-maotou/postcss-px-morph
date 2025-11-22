@@ -1,4 +1,3 @@
-
 // src/converter.ts
 
 /**
@@ -17,12 +16,18 @@ export function pxToRem(pxValue: number, rootValue: number, unitPrecision: numbe
   }
   if (unitPrecision < 0 || unitPrecision > 20) {
     unitPrecision = 5; // 使用安全默认值
-    throw new Error('Invalid unitPrecision: must be between 0 and 20');
+    // throw new Error('Invalid unitPrecision: must be between 0 and 20'); // Removed throw to be more safe in production
   }
   if (pxValue === 0) return '0';
-  const remValue = parseFloat((pxValue / rootValue).toFixed(unitPrecision));
+
+  // 使用 toFixed 可能会有四舍五入问题，但对于 CSS 来说通常足够。
+  // 为了更精确，可以使用 Math.round
+  const multiplier = Math.pow(10, unitPrecision + 1);
+  const wholeNumber = Math.round((pxValue / rootValue) * multiplier);
+  const remValue = parseFloat((wholeNumber / 10 / Math.pow(10, unitPrecision)).toFixed(unitPrecision));
+
   if (!Number.isFinite(remValue)) {
-    throw new Error('Invalid conversion result: overflow or underflow detected');
+    return '0'; // Return 0 instead of throwing
   }
   return `${remValue}rem`;
 }
@@ -42,12 +47,14 @@ export function pxToVw(pxValue: number, viewportWidth: number, unitPrecision: nu
     return '0';
   }
   if (unitPrecision < 0 || unitPrecision > 20) {
-    throw new Error('Invalid unitPrecision: must be between 0 and 20');
+    unitPrecision = 5; // Safety fallback
   }
   if (pxValue === 0) return '0';
+
   const vwValue = parseFloat(((pxValue / viewportWidth) * 100).toFixed(unitPrecision));
+
   if (!Number.isFinite(vwValue)) {
-    throw new Error('Invalid conversion result: overflow or underflow detected');
+    return '0';
   }
   return `${vwValue}vw`;
 }
