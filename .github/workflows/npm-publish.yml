@@ -1,0 +1,39 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main  # 必须与你在 npm 设置里填的分支一致
+
+# 关键：配置权限
+permissions:
+  contents: read
+  id-token: write # 必须有这一行！这是 OIDC 认证的关键，允许 GitHub 生成身份令牌
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 建议使用较新的 Node 版本
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci # 或者 npm install
+
+      # 关键步骤：发布
+      # --provenance 标志是 Trusted Publishers 的核心，它生成来源证明
+      - name: Publish package
+        run: npm publish --provenance --access public
+        env:
+          # 注意：这里不需要配置 NODE_AUTH_TOKEN，因为我们用了 id-token 和 provenance
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} 
+          # 修正：虽然 Trusted Publishers 可以不用 Token，但有时为了兼容性
+          # npm 官方文档建议：只要配置了 permissions: id-token: write
+          # 并且使用了 --provenance，npm 就会尝试使用 OIDC 认证。
+          # 如果你完全不想配置 Secrets，确保只运行 `npm publish --provenance`
