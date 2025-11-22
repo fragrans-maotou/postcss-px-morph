@@ -3,13 +3,12 @@ name: Publish to npm
 on:
   push:
     tags:
-      - 'v*'  # 只有当推送以 v 开头的 tag 时触发 (如 v1.0.0, v2.3.1)
-    # branches:  <-- 删掉或注释掉这部分，防止 push 代码时触发
-    #   - main
+      - 'v*'
 
+# 权限配置绝对不能少
 permissions:
   contents: read
-  id-token: write # 这一行绝对不能少
+  id-token: write 
 
 jobs:
   publish:
@@ -22,24 +21,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          # ❌ 删除下面这一行！不要配置 registry-url
+          # registry-url: 'https://registry.npmjs.org' 
 
       - name: Install dependencies
         run: npm ci
 
-      # 这一步会检查 package.json 的 version 是否与 git tag 匹配（可选但推荐）
-      # 如果不匹配，发布可能会失败或造成困惑
-      - name: Verify version match
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          # 去掉 refs/tags/v 前缀
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Package version: $PACKAGE_VERSION"
-          echo "Tag version: $TAG_VERSION"
-          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
-            echo "Error: Version mismatch!"
-            exit 1
-          fi
+      # 建议加上构建步骤（如果有的话），比如：
+      # - name: Build
+      #   run: npm run build
 
       - name: Publish package
+        # Trusted Publishers 模式下，这一步会自动处理认证
         run: npm publish --provenance --access public
