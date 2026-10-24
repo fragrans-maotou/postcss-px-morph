@@ -137,12 +137,16 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
   }
 }
 
+// PostCSS 8: mark creator so object config {'postcss-px-morph': {...}} works
+;(Plugin as any).postcss = true
+
 export default Plugin;
 
 // 兼容让插件在 require('postcss-px-morph') 中使用
 try {
   module.exports = Plugin;
   module.exports.default = Plugin;
+  module.exports.postcss = true;
 } catch (e) {
   // Ignore error in environments where module.exports is immutable
 }

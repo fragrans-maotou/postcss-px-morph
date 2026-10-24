@@ -36,7 +36,28 @@ pnpm add -D postcss postcss-px-morph
 
 ## 🛠️ Usage
 
-### Add to `vue.config.js`:
+### Add to `postcss.config.js` (recommended; works with Vite and modern setups)
+
+```javascript
+module.exports = {
+  plugins: [
+    require('postcss-px-morph')({
+      mode: 'hybrid', // 'rem' | 'vw' | 'hybrid'
+      rootValue: 16,
+      viewportWidth: 375,
+      hybridOptions: {
+        defaultMode: 'rem',
+        vwProperties: ['width', 'height', 'margin*', 'padding*'],
+        remProperties: ['font*']
+      }
+    })
+  ]
+}
+```
+
+### Vue CLI: add to `vue.config.js`
+
+> For Vite projects, use `postcss.config.js` above.
 
 Simple Usage
 ```javascript
@@ -84,25 +105,6 @@ module.exports = {
 }
 ```
 
-### Add it to your `postcss.config.js`:
-
-```javascript
-module.exports = {
-  plugins: [
-    require('postcss-px-morph')({
-      mode: 'hybrid', // 'rem' | 'vw' | 'hybrid'
-      rootValue: 16,
-      viewportWidth: 375,
-      hybridOptions: {
-        defaultMode: 'rem',
-        vwProperties: ['width', 'height', 'margin*', 'padding*'],
-        remProperties: ['font*']
-      }
-    })
-  ]
-}
-```
-
 ## ⚙️ Configuration
 
 | Option | Type | Default | Description |
@@ -126,7 +128,7 @@ module.exports = {
 | --- | --- | --- | --- |
 | `defaultMode` | `'rem' \| 'vw'` | `'rem'` | Fallback mode if property doesn't match lists. |
 | `vwProperties` | `string[]` | `[]` | Properties to convert to `vw` (supports `*` wildcard). |
-| `remProperties` | `string[]` | `[]` | Properties to convert to `rem` (supports `*` wildcard). |
+| `remProperties` | `string[]` | `[]` | Properties to convert to `rem` (supports `*` wildcard). When a property matches both `vwProperties` and `remProperties`, `remProperties` wins. |
 
 ## 📝 Ignore & Control
 

@@ -36,7 +36,28 @@ pnpm add -D postcss postcss-px-morph
 
 ## 🛠️ 使用方法
 
-### 加入到vue.config.js中
+### 添加到 `postcss.config.js`（推荐，Vite 等现代项目通用）
+
+```javascript
+module.exports = {
+  plugins: [
+    require('postcss-px-morph')({
+      mode: 'hybrid', // 'rem' | 'vw' | 'hybrid'
+      rootValue: 16,
+      viewportWidth: 375,
+      hybridOptions: {
+        defaultMode: 'rem',
+        vwProperties: ['width', 'height', 'margin*', 'padding*'],
+        remProperties: ['font*']
+      }
+    })
+  ]
+}
+```
+
+### Vue CLI：加入到 `vue.config.js`
+
+> Vite 项目请使用上方的 `postcss.config.js`。
 
 简单使用
 ```javascript
@@ -84,25 +105,6 @@ module.exports = {
 }
 ```
 
-### 将其添加到你的 `postcss.config.js`:
-
-```javascript
-module.exports = {
-  plugins: [
-    require('postcss-px-morph')({
-      mode: 'hybrid', // 'rem' | 'vw' | 'hybrid'
-      rootValue: 16,
-      viewportWidth: 375,
-      hybridOptions: {
-        defaultMode: 'rem',
-        vwProperties: ['width', 'height', 'margin*', 'padding*'],
-        remProperties: ['font*']
-      }
-    })
-  ]
-}
-```
-
 ## ⚙️ 配置项
 
 | 选项 | 类型 | 默认值 | 说明 |
@@ -126,7 +128,7 @@ module.exports = {
 | --- | --- | --- | --- |
 | `defaultMode` | `'rem' \| 'vw'` | `'rem'` | 未匹配到列表时的默认转换模式。 |
 | `vwProperties` | `string[]` | `[]` | 转换为 `vw` 的属性列表 (支持 `*` 通配符)。 |
-| `remProperties` | `string[]` | `[]` | 转换为 `rem` 的属性列表 (支持 `*` 通配符)。 |
+| `remProperties` | `string[]` | `[]` | 转换为 `rem` 的属性列表 (支持 `*` 通配符)。同一属性同时命中 `vwProperties` 与 `remProperties` 时，以 `remProperties` 为准。 |
 
 ## 📝 忽略与控制
 

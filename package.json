@@ -4,6 +4,13 @@
   "description": "A flexible PostCSS plugin to transform px to rem, vw, or a hybrid of both, with advanced configuration.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
@@ -43,6 +50,9 @@
     "dist"
   ],
   "homepage": "https://github.com/fragrans-maotou/postcss-px-morph",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@types/node": "^24.0.10",
     "postcss": "^8.5.6",
