@@ -1,35 +1,34 @@
 # Contributing to postcss-px-morph
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+Thanks for helping improve this project—whether you are reporting a bug, discussing code, submitting a fix, or proposing a feature.
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
+## Development workflow
 
-## Development Workflow
+1. Fork the repo and create your branch from `main`.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Build:
+   ```bash
+   npm run build
+   ```
+4. Run tests (non-watch; required for CI and local verification):
+   ```bash
+   npm run test:run
+   ```
+   Note: `npm test` is already an alias of `vitest run` (same as `test:run`). Use `npm run test:watch` only when you want watch mode.
+5. Make your changes and add tests.
+6. Re-run `npm run build && npm run test:run` before opening a PR.
+7. Update docs / CHANGELOG when behavior or public options change.
+8. Push and open a Pull Request (see the PR template checklist).
 
-1.  **Fork the repo** and create your branch from `main`.
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-3.  **Run tests** to ensure everything is working:
-    ```bash
-    npm run test
-    ```
-4.  **Make your changes**.
-5.  **Add tests** for your changes.
-6.  **Run tests again** to ensure no regressions.
-7.  **Commit your changes** using descriptive commit messages.
-8.  **Push** to your fork and submit a **Pull Request**.
+## Code style
 
-## Code Style
-
-- We use **TypeScript** for type safety.
-- Please ensure your code is formatted and linted (if applicable).
-- Write clear, self-documenting code.
+- TypeScript for type safety.
+- Zero breaking changes unless a major version is intentional: keep default `mode`, keep old APIs (aliases OK), keep hybrid priority (`remProperties` wins over `vwProperties`).
+- Prefer clear, self-documenting names over cleverness.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under its MIT License.
+By contributing, you agree that your contributions are licensed under the MIT License.

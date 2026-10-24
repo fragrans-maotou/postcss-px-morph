@@ -98,7 +98,13 @@ describe('PostCSS PxMorph Plugin', () => {
     const result = await run(input, { mode: 'rem', rootValue: 16, minusPxToMinusMode: true });
     expect(result).toBe('.test { margin: -1rem; }'); // 负值应转换
   });
-});
+
+  it('应该用 convertNegative:false 拒绝负值px', async () => {
+    const input = '.test { margin: -16px; }';
+    const result = await run(input, { mode: 'rem', rootValue: 16, convertNegative: false });
+    expect(result).toBe('.test { margin: -16px; }');
+  });
+
   it('hybrid 模式下通配符属性应正确匹配', async () => {
     const input = '.test { font-size: 16px; margin-top: 32px; padding-left: 16px; width: 37.5px; }';
     const expected = '.test { font-size: 1rem; margin-top: 8.53333vw; padding-left: 4.26667vw; width: 10vw; }';
@@ -120,3 +126,4 @@ describe('PostCSS PxMorph Plugin', () => {
     const result = await run(input, { mode: 'rem', rootValue: 16, enabled: false });
     expect(result).toBe(input);
   });
+});

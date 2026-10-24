@@ -66,7 +66,7 @@ const Plugin = (options = { mode: 'rem' }) => {
                     if ((0, helpers_1.isPxIgnore)(decl))
                         return;
                     // 2. 负值检查
-                    if (!opts.minusPxToMinusMode && (0, helpers_1.isMinusPx)(decl))
+                    if (!opts.convertNegative && (0, helpers_1.isMinusPx)(decl))
                         return;
                     // 3. 选择器黑名单检查
                     if (((_a = decl.parent) === null || _a === void 0 ? void 0 : _a.type) === 'rule') {
@@ -143,11 +143,13 @@ const Plugin = (options = { mode: 'rem' }) => {
         }
     };
 };
+Plugin.postcss = true;
 exports.default = Plugin;
 // 兼容让插件在 require('postcss-px-morph') 中使用
 try {
     module.exports = Plugin;
     module.exports.default = Plugin;
+    module.exports.postcss = true;
 }
 catch (e) {
     // Ignore error in environments where module.exports is immutable

@@ -12,7 +12,15 @@ export interface PxMorphOptions {
   unitPrecision?: number
   /** 触发转换的最小像素值 */
   minPixelValue?: number
-  /** 是否开启负值的转化 */
+  /**
+   * 是否转换负值 px（如 `-16px`）。推荐使用此选项。
+   * @default true
+   */
+  convertNegative?: boolean
+  /**
+   * 是否开启负值的转化
+   * @deprecated 请使用 `convertNegative`
+   */
   minusPxToMinusMode?: boolean
   /**
    * 'hybrid' 模式下，指定哪些属性转换为rem，哪些转换为vw

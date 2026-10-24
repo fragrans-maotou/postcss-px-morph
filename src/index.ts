@@ -55,7 +55,7 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
           if (isPxIgnore(decl)) return
 
           // 2. 负值检查
-          if (!opts.minusPxToMinusMode && isMinusPx(decl)) return
+          if (!opts.convertNegative && isMinusPx(decl)) return
 
           // 3. 选择器黑名单检查
           if (decl.parent?.type === 'rule') {

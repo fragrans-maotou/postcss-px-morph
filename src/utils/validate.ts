@@ -11,14 +11,19 @@ export const defaultOptions: Required<PxMorphOptions> = {
     remProperties: [],
     vwProperties: [],
   },
+  convertNegative: true,
   minusPxToMinusMode: true,
   include: ['**/*.css', '**/*.scss', '**/*.less', '**/*.styl', '**/*.stylus', '**/*.sass', '**/*.vue'],
+  // 1.0.4：仅保留样式相关噪音 + node_modules（PostCSS 碰不到的 *.min.js/ts/env 等已移除）
   exclude: [
-    '**/*.min.css', '**/*.min.scss', '**/*.min.less', '**/*.min.styl', '**/*.min.stylus', '**/*.min.sass',
-    '**/*.min.vue', '**/*.min.js', '**/*.min.ts', '**/*.min.tsx', '**/*.min.jsx', '**/*.min.json', '**/*.min.html',
-    '**/*.min.md', '**/*.min.txt', '**/*.min.xml', '**/*.min.yaml', '**/*.min.yml', '**/*.min.toml', '**/*.min.ini',
-    '**/*.min.conf', '**/*.min.config', '**/*.min.properties', '**/*.min.env', '**/*.min.env.local', '**/*.min.env.development',
-    '**/*.min.env.production', '**/*.min.env.test', 'node_modules/**/*'
+    '**/*.min.css',
+    '**/*.min.scss',
+    '**/*.min.less',
+    '**/*.min.styl',
+    '**/*.min.stylus',
+    '**/*.min.sass',
+    '**/*.min.vue',
+    'node_modules/**/*',
   ],
   selectorBlackList: [],
   mediaQuery: false,
@@ -46,6 +51,29 @@ export const validateOptions = (options: PxMorphOptions): Required<PxMorphOption
   if (!['rem', 'vw', 'hybrid'].includes(opts.mode)) {
     opts.mode = 'rem';
   }
+
+  // convertNegative 优先；兼容旧名 minusPxToMinusMode
+  const hasConvertNegative = Object.prototype.hasOwnProperty.call(options, 'convertNegative');
+  const hasMinusPxToMinusMode = Object.prototype.hasOwnProperty.call(options, 'minusPxToMinusMode');
+
+  if (
+    hasConvertNegative &&
+    hasMinusPxToMinusMode &&
+    options.convertNegative !== options.minusPxToMinusMode
+  ) {
+    console.warn(
+      '[postcss-px-morph] Both convertNegative and minusPxToMinusMode were set and differ; convertNegative takes precedence.'
+    );
+  }
+
+  const effectiveConvertNegative = hasConvertNegative
+    ? Boolean(options.convertNegative)
+    : hasMinusPxToMinusMode
+      ? Boolean(options.minusPxToMinusMode)
+      : true;
+
+  opts.convertNegative = effectiveConvertNegative;
+  opts.minusPxToMinusMode = effectiveConvertNegative;
 
   // 验证hybridOptions - 清理无效值
   if (opts.hybridOptions) {
@@ -82,6 +110,11 @@ export const validateOptions = (options: PxMorphOptions): Required<PxMorphOption
   // 验证 mediaQuery
   if (typeof opts.mediaQuery !== 'boolean') {
     opts.mediaQuery = false;
+  }
+
+  // 验证 enabled
+  if (typeof opts.enabled !== 'boolean') {
+    opts.enabled = true;
   }
 
   return opts as Required<PxMorphOptions>;
