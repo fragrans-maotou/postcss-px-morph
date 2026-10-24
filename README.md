@@ -117,6 +117,8 @@ module.exports = {
 | `hybridOptions` | `object` | `{}` | 混合模式的配置项。 |
 | `include` | `string[]` | `['**/*.css', ...]` | 需要包含的文件（支持 glob 模式）。 |
 | `exclude` | `string[]` | `['**/*.min.css', ...]` | 需要排除的文件（支持 glob 模式）。 |
+| `minusPxToMinusMode` | `boolean` | `true` | 是否转换负值 `px`（如 `-16px`）。 |
+| `enabled` | `boolean` | `true` | 是否启用插件转换。 |
 
 ### 混合模式配置 (Hybrid Options)
 

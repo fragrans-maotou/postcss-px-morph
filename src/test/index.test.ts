@@ -96,6 +96,27 @@ describe('PostCSS PxMorph Plugin', () => {
   it('应该处理负值px', async () => {
     const input = '.test { margin: -16px; }';
     const result = await run(input, { mode: 'rem', rootValue: 16, minusPxToMinusMode: true });
-    expect(result).toBe('.test { margin: -1rem; }'); // 负值不转换
+    expect(result).toBe('.test { margin: -1rem; }'); // 负值应转换
   });
 });
+  it('hybrid 模式下通配符属性应正确匹配', async () => {
+    const input = '.test { font-size: 16px; margin-top: 32px; padding-left: 16px; width: 37.5px; }';
+    const expected = '.test { font-size: 1rem; margin-top: 8.53333vw; padding-left: 4.26667vw; width: 10vw; }';
+    const result = await run(input, {
+      mode: 'hybrid',
+      rootValue: 16,
+      viewportWidth: 375,
+      hybridOptions: {
+        defaultMode: 'rem',
+        remProperties: ['font*'],
+        vwProperties: ['width', 'height', 'margin*', 'padding*'],
+      },
+    });
+    expect(result).toBe(expected);
+  });
+
+  it('enabled 为 false 时应跳过全部转换', async () => {
+    const input = '.test { font-size: 16px; }';
+    const result = await run(input, { mode: 'rem', rootValue: 16, enabled: false });
+    expect(result).toBe(input);
+  });

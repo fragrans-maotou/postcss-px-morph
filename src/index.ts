@@ -16,6 +16,9 @@ const Plugin = (options: PxMorphOptions = { mode: 'rem' }): Plugin => {
     postcssPlugin: 'px-morph',
 
     Once(root) {
+      // 全局开关
+      if (opts.enabled === false) return
+
       // 获取文件路径
       const filePath = root.source?.input?.file
 

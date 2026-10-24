@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkSelectorBlackList = exports.isMinusPx = exports.isPxIgnore = exports.isPropMatch = exports.sanitizeProperty = exports.pxRegex = void 0;
+exports.checkSelectorBlackList = exports.isMinusPx = exports.isPxIgnore = exports.isPropMatch = exports.sanitizePattern = exports.sanitizeProperty = exports.pxRegex = void 0;
 // 正则表达式用于匹配 px 值
 exports.pxRegex = /"([^"\n]*)"|'([^'\n]*)'|url\([^)\n]*\)|(\d*\.?\d+)px/g;
 /**
- * 限制属性名长度，防止ReDoS
+ * 限制属性名长度，防止 ReDoS；属性名不允许通配符
  */
 const sanitizeProperty = (prop) => {
     const MAX_LENGTH = 100;
@@ -15,6 +15,17 @@ const sanitizeProperty = (prop) => {
     return prop.replace(/[^a-zA-Z0-9-_]/g, '');
 };
 exports.sanitizeProperty = sanitizeProperty;
+/**
+ * 清理通配符模式：保留 *，去掉其它非法字符
+ */
+const sanitizePattern = (pattern) => {
+    const MAX_LENGTH = 100;
+    if (pattern.length > MAX_LENGTH) {
+        return pattern.substring(0, MAX_LENGTH);
+    }
+    return pattern.replace(/[^a-zA-Z0-9-_*]/g, '');
+};
+exports.sanitizePattern = sanitizePattern;
 /**
  * 检查属性是否匹配给定的模式列表
  */
@@ -27,7 +38,7 @@ const isPropMatch = (prop, properties) => {
     return properties.some(pattern => {
         if (!pattern || typeof pattern !== 'string')
             return false;
-        const sanitizedPattern = (0, exports.sanitizeProperty)(pattern.toLowerCase());
+        const sanitizedPattern = (0, exports.sanitizePattern)(pattern.toLowerCase());
         if (!sanitizedPattern)
             return false;
         if (sanitizedPattern === '*') {

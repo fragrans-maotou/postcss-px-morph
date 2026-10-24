@@ -25,9 +25,9 @@ export interface PxMorphOptions {
         /** 转换为vw的属性 */
         vwProperties?: string[];
     };
-    /** 需要包含的文件，支持正则表达式 */
+    /** 需要包含的文件，支持 glob 模式 */
     include?: string[];
-    /** 需要排除的文件，支持正则表达式 */
+    /** 需要排除的文件，支持 glob 模式 */
     exclude?: string[];
     /** 选择器黑名单，支持字符串和正则表达式 */
     selectorBlackList?: (string | RegExp)[];

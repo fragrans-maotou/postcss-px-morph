@@ -28,6 +28,9 @@ const Plugin = (options = { mode: 'rem' }) => {
         postcssPlugin: 'px-morph',
         Once(root) {
             var _a, _b;
+            // 全局开关
+            if (opts.enabled === false)
+                return;
             // 获取文件路径
             const filePath = (_b = (_a = root.source) === null || _a === void 0 ? void 0 : _a.input) === null || _b === void 0 ? void 0 : _b.file;
             // 如果有文件路径，检查包含/排除规则

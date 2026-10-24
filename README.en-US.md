@@ -117,6 +117,8 @@ module.exports = {
 | `hybridOptions` | `object` | `{}` | Configuration for hybrid mode. |
 | `include` | `string[]` | `['**/*.css', ...]` | Files to include (glob patterns). |
 | `exclude` | `string[]` | `['**/*.min.css', ...]` | Files to exclude (glob patterns). |
+| `minusPxToMinusMode` | `boolean` | `true` | Convert negative `px` values (e.g. `-16px`). |
+| `enabled` | `boolean` | `true` | Enable or disable the plugin. |
 
 ### Hybrid Options
 

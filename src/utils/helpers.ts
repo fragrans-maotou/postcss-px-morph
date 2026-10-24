@@ -4,7 +4,7 @@ import { Declaration } from 'postcss'
 export const pxRegex = /"([^"\n]*)"|'([^'\n]*)'|url\([^)\n]*\)|(\d*\.?\d+)px/g
 
 /**
- * 限制属性名长度，防止ReDoS
+ * 限制属性名长度，防止 ReDoS；属性名不允许通配符
  */
 export const sanitizeProperty = (prop: string): string => {
   const MAX_LENGTH = 100;
@@ -13,6 +13,17 @@ export const sanitizeProperty = (prop: string): string => {
   }
   // 只允许字母、数字、连字符和下划线
   return prop.replace(/[^a-zA-Z0-9-_]/g, '');
+};
+
+/**
+ * 清理通配符模式：保留 *，去掉其它非法字符
+ */
+export const sanitizePattern = (pattern: string): string => {
+  const MAX_LENGTH = 100;
+  if (pattern.length > MAX_LENGTH) {
+    return pattern.substring(0, MAX_LENGTH);
+  }
+  return pattern.replace(/[^a-zA-Z0-9-_*]/g, '');
 };
 
 /**
@@ -27,7 +38,7 @@ export const isPropMatch = (prop: string, properties: string[]): boolean => {
   return properties.some(pattern => {
     if (!pattern || typeof pattern !== 'string') return false;
 
-    const sanitizedPattern = sanitizeProperty(pattern.toLowerCase());
+    const sanitizedPattern = sanitizePattern(pattern.toLowerCase());
     if (!sanitizedPattern) return false;
 
     if (sanitizedPattern === '*') {
